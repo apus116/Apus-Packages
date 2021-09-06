@@ -211,6 +211,10 @@ o = s:taboption("dns", Flag, "enable_custom_dns", font_red..bold_on..translate("
 o.description = font_red..bold_on..translate("Set OpenClash Upstream DNS Resolve Server")..bold_off..font_off
 o.default=0
 
+o = s:taboption("dns", Flag, "append_wan_dns", font_red..bold_on..translate("Append Upstream DNS")..bold_off..font_off)
+o.description = font_red..bold_on..translate("Append The Upstream Assigned DNS And Gateway IP To The Nameserver")..bold_off..font_off
+o.default=1
+
 o = s:taboption("dns", Flag, "ipv6_dns", translate("IPv6 DNS Resolve"))
 o.description = font_red..bold_on..translate("Enable Clash to Resolve ipv6 DNS Requests")..bold_off..font_off
 o.default=0
@@ -586,6 +590,19 @@ o = s:taboption("dashboard", Value, "dashboard_password")
 o.title = translate("Dashboard Secret")
 o.rmempty = true
 o.description = translate("Set Dashboard Secret")
+
+o = s:taboption("dashboard", Value, "dashboard_forward_domain")
+o.title = translate("Public Dashboard Address")
+o.datatype = "or(host, string)"
+o.placeholder = "example.com"
+o.rmempty = true
+o.description = translate("Domain Name For Dashboard Login From Public Network")
+
+o = s:taboption("dashboard", Value, "dashboard_forward_port")
+o.title = translate("Public Dashboard Port")
+o.datatype = "port"
+o.rmempty = true
+o.description = translate("Port For Dashboard Login From Public Network")
 
 ---- version update
 core_update = s:taboption("version_update", DummyValue, "", nil)

@@ -146,6 +146,14 @@ local function dase()
 	return uci:get("openclash", "config", "dashboard_password")
 end
 
+local function db_foward_domain()
+	return uci:get("openclash", "config", "dashboard_forward_domain")
+end
+
+local function db_foward_port()
+	return uci:get("openclash", "config", "dashboard_forward_port")
+end
+
 local function check_lastversion()
 	luci.sys.exec("sh /usr/share/openclash/openclash_version.sh 2>/dev/null")
 	return luci.sys.exec("sed -n '/^https:/,$p' /tmp/openclash_last_version 2>/dev/null")
@@ -555,7 +563,7 @@ end
 
 function action_toolbar_show()
 	local pid = luci.sys.exec("pidof clash |tr -d '\n' 2>/dev/null")
-	local traffic, connections, up, down, up_total, down_total, mem, cpu
+	local traffic, connections, connection, up, down, up_total, down_total, mem, cpu
 	if pid and pid ~= "" then
 		local daip = daip()
 		local dase = dase() or ""
@@ -564,7 +572,7 @@ function action_toolbar_show()
 		traffic = json.parse(luci.sys.exec(string.format('curl -sL -m 3 -H "Content-Type: application/json" -H "Authorization: Bearer %s" -XGET http://"%s":"%s"/traffic', dase, daip, cn_port)))
 		connections = json.parse(luci.sys.exec(string.format('curl -sL -m 3 -H "Content-Type: application/json" -H "Authorization: Bearer %s" -XGET http://"%s":"%s"/connections', dase, daip, cn_port)))
 		if traffic and connections then
-			connections = #(connections.connections)
+			connection = #(connections.connections)
 			up = s(traffic.up)
 			down = s(traffic.down)
 			up_total = i(connections.uploadTotal)
@@ -574,7 +582,7 @@ function action_toolbar_show()
 			down = "0 B/S"
 			up_total = "0 KB"
 			down_total = "0 KB"
-			connections = "0"
+			connection = "0"
 		end
 		mem = tonumber(luci.sys.exec(string.format("cat /proc/%s/status 2>/dev/null |grep -w VmRSS |awk '{print $2}'", pid)))
 		cpu = luci.sys.exec(string.format("top -b -n1 |grep %s 2>/dev/null |head -1 |awk '{print $7}' 2>/dev/null", pid))
@@ -590,7 +598,7 @@ function action_toolbar_show()
 	end
 	luci.http.prepare_content("application/json")
 	luci.http.write_json({
-		connections = connections,
+		connections = connection,
 		up = up,
 		down = down,
 		up_total = up_total,
@@ -690,6 +698,8 @@ function action_status()
 		watchdog = is_watchdog(),
 		daip = daip(),
 		dase = dase(),
+		db_foward_port = db_foward_port(),
+		db_foward_domain = db_foward_domain(),
 		web = is_web(),
 		cn_port = cn_port(),
 		restricted_mode = restricted_mode(),
