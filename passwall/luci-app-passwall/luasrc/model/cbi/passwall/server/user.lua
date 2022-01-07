@@ -32,6 +32,10 @@ local v_ss_encrypt_method_list = {
     "aes-128-gcm", "aes-256-gcm", "chacha20-poly1305"
 }
 
+local x_ss_encrypt_method_list = {
+    "aes-128-gcm", "aes-256-gcm", "chacha20-poly1305", "xchacha20-poly1305"
+}
+
 local header_type_list = {
     "none", "srtp", "utp", "wechat-video", "dtls", "wireguard"
 }
@@ -222,13 +226,26 @@ end
 v_ss_encrypt_method = s:option(ListValue, "v_ss_encrypt_method", translate("Encrypt Method"))
 for a, t in ipairs(v_ss_encrypt_method_list) do v_ss_encrypt_method:value(t) end
 v_ss_encrypt_method:depends({ type = "V2ray", protocol = "shadowsocks" })
-v_ss_encrypt_method:depends({ type = "Xray", protocol = "shadowsocks" })
 function v_ss_encrypt_method.cfgvalue(self, section)
 	return m:get(section, "method")
 end
 function v_ss_encrypt_method.write(self, section, value)
 	m:set(section, "method", value)
 end
+
+x_ss_encrypt_method = s:option(ListValue, "x_ss_encrypt_method", translate("Encrypt Method"))
+for a, t in ipairs(x_ss_encrypt_method_list) do x_ss_encrypt_method:value(t) end
+x_ss_encrypt_method:depends({ type = "Xray", protocol = "shadowsocks" })
+function x_ss_encrypt_method.cfgvalue(self, section)
+	return m:get(section, "method")
+end
+function x_ss_encrypt_method.write(self, section, value)
+	m:set(section, "method", value)
+end
+
+iv_check = s:option(Flag, "iv_check", translate("IV Check"))
+iv_check:depends({ type = "V2ray", protocol = "shadowsocks" })
+iv_check:depends({ type = "Xray", protocol = "shadowsocks" })
 
 ss_network = s:option(ListValue, "ss_network", translate("Transport"))
 ss_network.default = "tcp,udp"
@@ -284,10 +301,6 @@ uuid:depends({ type = "Xray", protocol = "trojan" })
 uuid:depends("type", "Trojan")
 uuid:depends("type", "Trojan-Go")
 uuid:depends("type", "Trojan-Plus")
-
-alter_id = s:option(Value, "alter_id", translate("Alter ID"))
-alter_id:depends({ type = "V2ray", protocol = "vmess" })
-alter_id:depends({ type = "Xray", protocol = "vmess" })
 
 tls = s:option(Flag, "tls", translate("TLS"))
 tls.default = 0
