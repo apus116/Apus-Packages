@@ -40,6 +40,9 @@ jobs:
           - arch: i386_pentium-mmx
             target: x86-geode
 
+          - arch: x86_64
+            target: x86-64
+
     steps:
       - uses: actions/checkout@v2
         with:
@@ -75,7 +78,7 @@ jobs:
           echo "PACKAGES=$PACKAGES" >> $GITHUB_ENV
 
       - name: Build
-        uses: immortalwrt/gh-action-sdk@v2
+        uses: immortalwrt/gh-action-sdk@v3
         env:
           ARCH: ${{ matrix.arch }}-${{ env.BRANCH }}
           FEEDNAME: packages_ci
